@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_USER=postgres
+      - DB_HOST=db
+      - DB_NAME=audio_hosting_db
+      - DB_PASS=Royg2biv
+      - DB_PORT=5432
+      - JWT_SECRET=yourjwtsecret
+    depends_on:
+      - db
+
+  frontend:
+    build: ./audio-file-hosting
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Royg2biv
+      POSTGRES_DB: audio_hosting_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

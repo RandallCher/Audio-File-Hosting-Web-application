@@ -1,19 +1,37 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        alert(`Logging in as: ${username}`);
+        setError("");
+
+        const res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem("username", username); // Temporary session storage
+            router.push("/dashboard"); // Redirect to dashboard
+        } else {
+            setError(data.error);
+        }
     };
 
     return (
         <main className="flex min-h-screen items-center justify-center">
             <div className="p-6 bg-white rounded-lg shadow-md">
                 <h1 className="text-2xl font-bold mb-4">Login</h1>
+                {error && <p className="text-red-500">{error}</p>}
                 <form onSubmit={handleLogin}>
                     <input
                         type="text"
